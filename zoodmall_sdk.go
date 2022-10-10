@@ -5,13 +5,15 @@ import (
 	"fmt"
 
 	"github.com/ybbus/jsonrpc/v3"
-
-	"github.com/billz-uz/zoodmall_sdk/pkg/structures"
 )
 
 const (
-	methodCreateProduct = "LocalProductRpc.create"
-	methodFindProducts  = "LocalProductRpc.finds"
+	methodProductsFind   = "LocalProductRpc.finds"
+	methodProductsCreate = "LocalProductRpc.create"
+	methodProductsUpdate = "LocalProductRpc.change"
+
+	methodVariantsCreate = "LocalProductRpc.addSku"
+	methodVariantsUpdate = "LocalProductRpc.changeSku"
 )
 
 type Client struct {
@@ -31,34 +33,86 @@ func New(host, username, password string) *Client {
 	}
 }
 
-func (c *Client) CreateProduct(ctx context.Context, data structures.ReqCreateProduct) (
-	id string, sku string, err error,
-) {
-	response, err := c.rpc.Call(ctx, methodCreateProduct, data)
+func (c *Client) ProductsFind(ctx context.Context, data ReqProductsFind) (ProductList, error) {
+	response, err := c.rpc.Call(ctx, methodProductsFind, data)
 	if err != nil {
-		return "", "", fmt.Errorf("CreateProduct: failed http request: %w", err)
+		return nil, fmt.Errorf("ProductsFind: failed http request: %w", err)
 	}
 
-	var res *structures.ResCreateProduct
-	if err := parseResponse(response, res); err != nil {
-		return "", "", err
-	}
-
-	return res.ID, res.SKU, nil
-}
-
-func (c *Client) FindProducts(ctx context.Context, data structures.ReqFindProducts) (*structures.ProductList, error) {
-	response, err := c.rpc.Call(ctx, methodFindProducts, data)
-	if err != nil {
-		return nil, fmt.Errorf("FindProducts: failed http request: %w", err)
-	}
-
-	var res *structures.ResFindProducts
+	var res *resFindProducts
 	if err := parseResponse(response, res); err != nil {
 		return nil, err
 	}
 
-	return &res.Products, nil
+	return res.Products, nil
+}
+
+func (c *Client) ProductsCreate(ctx context.Context, data []ReqProductCreate) (
+	ProductIdentifierList,
+	error,
+) {
+	response, err := c.rpc.Call(ctx, methodProductsCreate, data)
+	if err != nil {
+		return nil, fmt.Errorf("ProductsCreate: failed http request: %w", err)
+	}
+
+	var res ProductIdentifierList
+	if err := parseResponse(response, &res); err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (c *Client) ProductsUpdate(ctx context.Context, data []ReqProductUpdate) (
+	ProductIdentifierList,
+	error,
+) {
+	response, err := c.rpc.Call(ctx, methodProductsUpdate, data)
+	if err != nil {
+		return nil, fmt.Errorf("ProductsUpdate: failed http request: %w", err)
+	}
+
+	var res ProductIdentifierList
+	if err := parseResponse(response, &res); err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (c *Client) VariantsCreate(ctx context.Context, data []ReqVariantCreate) (
+	ProductIdentifierList,
+	error,
+) {
+	response, err := c.rpc.Call(ctx, methodVariantsCreate, data)
+	if err != nil {
+		return nil, fmt.Errorf("VariantsCreate: failed http request: %w", err)
+	}
+
+	var res ProductIdentifierList
+	if err := parseResponse(response, &res); err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (c *Client) VariantsUpdate(ctx context.Context, data []ReqVariantUpdate) (
+	ProductIdentifierList,
+	error,
+) {
+	response, err := c.rpc.Call(ctx, methodVariantsUpdate, data)
+	if err != nil {
+		return nil, fmt.Errorf("VariantsUpdate: failed http request: %w", err)
+	}
+
+	var res ProductIdentifierList
+	if err := parseResponse(response, &res); err != nil {
+		return nil, err
+	}
+
+	return res, nil
 }
 
 func parseResponse(res *jsonrpc.RPCResponse, data interface{}) error {

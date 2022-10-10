@@ -1,4 +1,4 @@
-package structures
+package zoodmall_sdk
 
 type Property struct {
 	SKU      string  `json:"sku"`

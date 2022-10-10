@@ -1,4 +1,4 @@
-package structures
+package zoodmall_sdk
 
 type Pagination struct {
 	Page        uint `json:"page"`

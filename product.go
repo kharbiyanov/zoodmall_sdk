@@ -1,7 +1,9 @@
-package structures
+package zoodmall_sdk
+
+type ProductID int64
 
 type Product struct {
-	ID              int64             `json:"productId"`
+	ID              ProductID         `json:"productId"`
 	SPU             string            `json:"spu"`
 	Name            string            `json:"name"`
 	NameLang        map[string]string `json:"nameLang"`
@@ -11,7 +13,7 @@ type Product struct {
 	PropertyName    string            `json:"propertyName"`
 	Properties      []Property        `json:"property"`
 	SProperties     []SProperty       `json:"sproperty"`
-	SPropertyLang   []SPropertyLang   `json:"spropertyLang"`
+	SPropertyLang   SPropertyLang     `json:"spropertyLang"`
 	SKUType         uint              `json:"skuType"`
 	Currency        string            `json:"currency"`
 	MarketCodes     string            `json:"marketCodes"`
@@ -35,3 +37,10 @@ type Product struct {
 }
 
 type ProductList []Product
+
+type ProductIdentifier struct {
+	ID  ProductID `json:"productId"` // Product ID of specified SKU
+	SKU string    `json:"sku"`
+}
+
+type ProductIdentifierList []ProductIdentifier
